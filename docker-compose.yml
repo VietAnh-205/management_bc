@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: circlek_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: circlek_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: circlek_app
+    depends_on:
+      - db
+    environment:
+      # Database
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      # JWT
+      RS_SECURITY_JWT_EXPIRATION: ${JWT_EXPIRATION}
+      RS_SECURITY_JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+
+      # RSA Keys
+      RS_KEY_PUBLIC_KEY_FILE: ${PUBLIC_KEY_FILE}
+      RS_KEY_PRIVATE_KEY_FILE: ${PRIVATE_KEY_FILE}
+      RS_KEY_SECRET: ${JWT_SECRET}
+
+      # Swagger
+      SPRINGDOC_SWAGGER_UI_ENABLED: ${SWAGGER_ENABLED}
+
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
